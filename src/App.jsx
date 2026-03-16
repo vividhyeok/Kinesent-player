@@ -49,19 +49,20 @@ function App() {
   const isReady = status === 'ready'
   const isLoading = status === 'loading'
   const shouldRenderScene = Boolean(presentation && currentScene && status !== 'error')
+  const canToggleFullscreen = shouldRenderScene && isFullscreenSupported
 
   return (
     <ZipDropzone
-      disabled={isLoading}
+      disabled={isLoading || isFullscreen}
       onFileReject={handleFileReject}
       onFileSelect={loadPresentation}
     >
-      <PlayerShell ref={shellRef}>
+      <PlayerShell isFullscreen={isFullscreen} ref={shellRef}>
         <PlayerHeader
           currentSceneNumber={currentSceneNumber}
           isBusy={isLoading}
           isFullscreen={isFullscreen}
-          isFullscreenSupported={isFullscreenSupported}
+          isFullscreenSupported={canToggleFullscreen}
           onFileReject={handleFileReject}
           onFileSelect={loadPresentation}
           onToggleFullscreen={toggleFullscreen}
@@ -70,7 +71,7 @@ function App() {
           totalScenes={totalScenes}
         />
 
-        <PlayerStage>
+        <PlayerStage isFullscreen={isFullscreen}>
           {status === 'error' ? (
             <LoadErrorPanel error={error} onClear={clearError}>
               <ZipOpenButton
@@ -120,8 +121,11 @@ function App() {
           ) : null}
         </PlayerStage>
 
-        <PlayerFooter>
-          <PlaybackHint isPresentationReady={isReady} />
+        <PlayerFooter isFullscreen={isFullscreen}>
+          <PlaybackHint
+            isFullscreen={isFullscreen}
+            isPresentationReady={isReady}
+          />
           <TriggerController disabled={!isReady || !currentScene} onTrigger={triggerNext} />
         </PlayerFooter>
 

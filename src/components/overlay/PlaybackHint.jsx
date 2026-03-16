@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { PLAYBACK_HINT_IDLE_MS } from '../../lib/constants.js'
 
-function PlaybackHint({ isPresentationReady }) {
+function PlaybackHint({ isFullscreen, isPresentationReady }) {
   const hideTimerRef = useRef(null)
   const [isVisible, setIsVisible] = useState(true)
 
@@ -23,6 +23,14 @@ function PlaybackHint({ isPresentationReady }) {
   })
 
   useEffect(() => {
+    if (isFullscreen) {
+      window.clearTimeout(hideTimerRef.current)
+
+      return () => {
+        window.clearTimeout(hideTimerRef.current)
+      }
+    }
+
     revealHint()
 
     if (!isPresentationReady) {
@@ -47,7 +55,11 @@ function PlaybackHint({ isPresentationReady }) {
       window.removeEventListener('touchstart', handleActivity)
       window.removeEventListener('keydown', handleActivity)
     }
-  }, [isPresentationReady])
+  }, [isFullscreen, isPresentationReady])
+
+  if (isFullscreen) {
+    return null
+  }
 
   return (
     <div
@@ -58,7 +70,7 @@ function PlaybackHint({ isPresentationReady }) {
       <p className="font-semibold text-white">다음 진행: 스페이스바 또는 PageDown</p>
       <p className="mt-1 text-slate-300">
         {isPresentationReady
-          ? 'animated 씬은 하이라이트 순서에 따라 진행되고, 마지막 단계가 끝나면 다음 씬으로 이동합니다.'
+          ? 'animated 씬은 highlightOrder 순서대로 진행되고, 마지막 단계가 끝나면 다음 씬으로 이동합니다.'
           : 'ZIP 파일을 열면 프레젠테이션 리모컨이나 키보드로 바로 진행할 수 있습니다.'}
       </p>
     </div>

@@ -8,20 +8,30 @@ function SceneRenderer({ revealedHighlightCount, scene }) {
   }
 
   if (scene.type === 'loop') {
-    return <LoopScene key={`${scene.id}:${scene.assetUrl}`} scene={scene} />
+    return (
+      <div className="h-full w-full">
+        <LoopScene key={`${scene.id}:${scene.assetUrl}`} scene={scene} />
+      </div>
+    )
   }
 
   if (scene.type === 'animated') {
     return (
-      <AnimatedScene
-        key={`${scene.id}:${scene.asset}`}
-        revealedHighlightCount={revealedHighlightCount}
-        scene={scene}
-      />
+      <div className="h-full w-full">
+        <AnimatedScene
+          key={`${scene.id}:${scene.asset}`}
+          revealedHighlightCount={revealedHighlightCount}
+          scene={scene}
+        />
+      </div>
     )
   }
 
-  return <StaticScene key={`${scene.id}:${scene.assetUrl}`} scene={scene} />
+  return (
+    <div className="h-full w-full">
+      <StaticScene key={`${scene.id}:${scene.assetUrl}`} scene={scene} />
+    </div>
+  )
 }
 
 export default SceneRenderer

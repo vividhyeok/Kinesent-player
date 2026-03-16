@@ -8,6 +8,7 @@ export const SCENE_SCHEMA = {
   triggers: 'number',
   highlightOrder: ['string'],
   advanceOnLastHighlight: 'boolean (optional)',
+  script: 'string (optional)',
 }
 
 export const MANIFEST_SCHEMA = {
@@ -25,6 +26,7 @@ export function createManifestExample() {
         type: 'static',
         asset: 'assets/scene-1.png',
         triggers: 1,
+        script: '발표자가 이 씬에서 말할 메모입니다.',
       },
       {
         id: 'scene-2',

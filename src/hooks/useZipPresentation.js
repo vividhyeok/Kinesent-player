@@ -239,6 +239,7 @@ export function useZipPresentation() {
         ensureCurrentLoad()
 
         const scene = manifest.scenes[sceneIndex]
+        const { script: _ignoredScript, ...presentationScene } = scene
         const normalizedAssetPath = normalizeZipPath(scene.asset)
         const assetCacheKey = getAssetCacheKey(scene.type, normalizedAssetPath)
         assertSceneAssetType(scene)
@@ -296,7 +297,7 @@ export function useZipPresentation() {
         const assetData = assetCache.get(assetCacheKey)
 
         processedScenes.push({
-          ...scene,
+          ...presentationScene,
           asset: normalizedAssetPath,
           highlightOrder: Array.isArray(scene.highlightOrder)
             ? scene.highlightOrder

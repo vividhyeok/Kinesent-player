@@ -35,6 +35,10 @@ export const LOOP_VIDEO_EXTENSIONS = new Set(['.mp4'])
 
 export const ANIMATED_EXTENSIONS = new Set(['.svg'])
 
+export const CANVAS_ASPECT_RATIO_WIDTH = 16
+
+export const CANVAS_ASPECT_RATIO_HEIGHT = 9
+
 export const PRELOAD_SCENE_RADIUS = 1
 
 export const KEYBOARD_TRIGGER_CODES = new Set(['Space', 'PageDown'])

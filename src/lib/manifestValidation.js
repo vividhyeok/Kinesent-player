@@ -67,6 +67,10 @@ function validateScene(scene, index) {
     errors.push(`${path}.advanceOnLastHighlight는 boolean 값이어야 합니다.`)
   }
 
+  if (scene.script !== undefined && typeof scene.script !== 'string') {
+    errors.push(`${path}.script는 문자열이어야 합니다.`)
+  }
+
   return errors
 }
 

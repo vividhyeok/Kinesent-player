@@ -14,6 +14,10 @@ function PlayerHeader({
   onFileReject,
   isBusy,
 }) {
+  if (isFullscreen) {
+    return null
+  }
+
   return (
     <header className="shrink-0 px-4 pt-4 sm:px-6 sm:pt-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 rounded-[1.75rem] border border-white/10 bg-slate-950/56 px-5 py-4 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
@@ -32,13 +36,14 @@ function PlayerHeader({
         <div className="flex flex-wrap items-center gap-3">
           <SceneCounterBadge
             currentSceneNumber={currentSceneNumber}
+            isFullscreen={isFullscreen}
             totalScenes={totalScenes}
           />
           <ZipOpenButton
-            label="ZIP 열기"
             disabled={isBusy}
-            onFileSelect={onFileSelect}
+            label="ZIP 열기"
             onFileReject={onFileReject}
+            onFileSelect={onFileSelect}
           />
           <FullscreenButton
             disabled={!isFullscreenSupported}

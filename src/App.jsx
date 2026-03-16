@@ -34,7 +34,7 @@ function App() {
   const {
     currentScene,
     currentSceneIndex,
-    revealedHighlightCount,
+    currentTriggerStep,
     totalScenes,
     triggerNext,
   } = usePresentationState(presentation)
@@ -108,7 +108,7 @@ function App() {
 
           {shouldRenderScene ? (
             <SceneRenderer
-              revealedHighlightCount={revealedHighlightCount}
+              currentTriggerStep={currentTriggerStep}
               scene={currentScene}
             />
           ) : null}

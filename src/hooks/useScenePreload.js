@@ -66,7 +66,7 @@ export function useScenePreload(presentation, currentSceneIndex) {
     for (let sceneIndex = startIndex; sceneIndex <= endIndex; sceneIndex += 1) {
       const scene = presentation.scenes[sceneIndex]
 
-      if (!scene?.assetUrl || scene.type === 'animated') {
+      if (!scene?.assetUrl || scene.type === 'animated' || scene.type === 'procedural') {
         continue
       }
 

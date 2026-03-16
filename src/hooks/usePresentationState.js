@@ -4,7 +4,7 @@ import { getTriggerOutcome } from '../lib/sceneProgress.js'
 
 const INITIAL_PROGRESS = {
   currentSceneIndex: 0,
-  revealedHighlightCount: 0,
+  currentTriggerStep: 0,
   isPresentationComplete: false,
   pendingAdvance: null,
 }
@@ -41,7 +41,7 @@ function progressReducer(state, action) {
     if (state.pendingAdvance.type === 'scene') {
       return {
         currentSceneIndex: state.pendingAdvance.targetSceneIndex,
-        revealedHighlightCount: 0,
+        currentTriggerStep: 0,
         isPresentationComplete: false,
         pendingAdvance: null,
       }
@@ -67,25 +67,24 @@ function progressReducer(state, action) {
       return state
     }
 
-    const outcome = getTriggerOutcome(activeScene, state.revealedHighlightCount)
+    const outcome = getTriggerOutcome(activeScene, state.currentTriggerStep)
 
-    if (outcome.action === 'highlight') {
+    if (outcome.action === 'step') {
       return {
         ...state,
-        revealedHighlightCount: outcome.nextRevealedHighlightCount,
+        currentTriggerStep: outcome.nextTriggerStep,
         isPresentationComplete: false,
       }
     }
 
     if (outcome.action === 'advance') {
       const hasNextScene = state.currentSceneIndex < presentation.scenes.length - 1
-      const revealedNewHighlight =
-        outcome.nextRevealedHighlightCount > state.revealedHighlightCount
+      const advancedWithinScene = outcome.nextTriggerStep > state.currentTriggerStep
 
-      if (revealedNewHighlight) {
+      if (advancedWithinScene) {
         return {
           ...state,
-          revealedHighlightCount: outcome.nextRevealedHighlightCount,
+          currentTriggerStep: outcome.nextTriggerStep,
           isPresentationComplete: false,
           pendingAdvance: createPendingAdvance(
             hasNextScene ? state.currentSceneIndex + 1 : null,
@@ -96,7 +95,7 @@ function progressReducer(state, action) {
       if (hasNextScene) {
         return {
           currentSceneIndex: state.currentSceneIndex + 1,
-          revealedHighlightCount: 0,
+          currentTriggerStep: 0,
           isPresentationComplete: false,
           pendingAdvance: null,
         }
@@ -152,7 +151,8 @@ export function usePresentationState(presentation) {
   return {
     currentScene,
     currentSceneIndex: progress.currentSceneIndex,
-    revealedHighlightCount: progress.revealedHighlightCount,
+    currentTriggerStep: progress.currentTriggerStep,
+    revealedHighlightCount: progress.currentTriggerStep,
     isPresentationComplete: progress.isPresentationComplete,
     isAutoAdvancing: Boolean(progress.pendingAdvance),
     totalScenes,

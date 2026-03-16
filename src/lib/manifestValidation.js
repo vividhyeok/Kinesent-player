@@ -1,4 +1,8 @@
 import { SCENE_TYPE_SET } from './constants.js'
+import {
+  hasValidProceduralConfigShape,
+  isProceduralSceneType,
+} from './proceduralValidation.js'
 import { MANIFEST_SCHEMA } from './manifestSchema.js'
 
 function isPlainObject(value) {
@@ -26,7 +30,7 @@ function validateScene(scene, index) {
   const path = `scenes[${index}]`
 
   if (!isPlainObject(scene)) {
-    errors.push(`${path} 항목은 객체여야 합니다.`)
+    errors.push(`${path}는 객체여야 합니다.`)
     return errors
   }
 
@@ -39,11 +43,27 @@ function validateScene(scene, index) {
   }
 
   if (!isNonEmptyString(scene.type) || !SCENE_TYPE_SET.has(scene.type)) {
-    errors.push(`${path}.type은 static, loop, animated 중 하나여야 합니다.`)
+    errors.push(`${path}.type은 static, loop, animated, procedural 중 하나여야 합니다.`)
   }
 
-  if (!isNonEmptyString(scene.asset)) {
-    errors.push(`${path}.asset은 비어 있지 않은 문자열이어야 합니다.`)
+  if (isProceduralSceneType(scene.type)) {
+    if (!hasValidProceduralConfigShape(scene)) {
+      errors.push(
+        `${path}.template과 ${path}.config는 procedural 씬에서 올바른 템플릿 이름과 객체여야 합니다.`,
+      )
+    }
+  } else if (!isNonEmptyString(scene.asset)) {
+    errors.push(
+      `${path}.asset은 static, loop, animated 씬에서 비어 있지 않은 문자열이어야 합니다.`,
+    )
+  }
+
+  if (
+    scene.asset !== undefined &&
+    scene.asset !== null &&
+    typeof scene.asset !== 'string'
+  ) {
+    errors.push(`${path}.asset은 문자열이어야 합니다.`)
   }
 
   if (!isPositiveInteger(scene.triggers)) {
@@ -69,6 +89,18 @@ function validateScene(scene, index) {
 
   if (scene.script !== undefined && typeof scene.script !== 'string') {
     errors.push(`${path}.script는 문자열이어야 합니다.`)
+  }
+
+  if (scene.template !== undefined && typeof scene.template !== 'string') {
+    errors.push(`${path}.template은 문자열이어야 합니다.`)
+  }
+
+  if (
+    scene.config !== undefined &&
+    scene.config !== null &&
+    !isPlainObject(scene.config)
+  ) {
+    errors.push(`${path}.config는 객체여야 합니다.`)
   }
 
   return errors

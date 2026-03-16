@@ -1,8 +1,9 @@
 import AnimatedScene from './AnimatedScene.jsx'
 import LoopScene from './LoopScene.jsx'
+import ProceduralScene from './ProceduralScene.jsx'
 import StaticScene from './StaticScene.jsx'
 
-function SceneRenderer({ revealedHighlightCount, scene }) {
+function SceneRenderer({ currentTriggerStep, scene }) {
   if (!scene) {
     return null
   }
@@ -20,8 +21,22 @@ function SceneRenderer({ revealedHighlightCount, scene }) {
       <div className="h-full w-full">
         <AnimatedScene
           key={`${scene.id}:${scene.asset}`}
-          revealedHighlightCount={revealedHighlightCount}
+          revealedHighlightCount={currentTriggerStep}
           scene={scene}
+        />
+      </div>
+    )
+  }
+
+  if (scene.type === 'procedural') {
+    return (
+      <div className="h-full w-full">
+        <ProceduralScene
+          config={scene.config}
+          currentTriggerStep={currentTriggerStep}
+          sceneTitle={scene.title}
+          template={scene.template}
+          triggers={scene.triggers}
         />
       </div>
     )

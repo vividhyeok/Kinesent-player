@@ -6,9 +6,18 @@ export const MANIFEST_FILE_NAME = 'manifest.json'
 
 export const ASSET_DIRECTORY_NAME = 'assets'
 
-export const SCENE_TYPES = ['static', 'loop', 'animated']
+export const SCENE_TYPES = ['static', 'loop', 'animated', 'procedural']
 
 export const SCENE_TYPE_SET = new Set(SCENE_TYPES)
+
+export const PROCEDURAL_SCENE_TEMPLATES = [
+  'stack3d',
+  'queue3d',
+  'linkedlist3d',
+  'array3d',
+]
+
+export const PROCEDURAL_TEMPLATE_SET = new Set(PROCEDURAL_SCENE_TEMPLATES)
 
 export const ZIP_FILE_EXTENSION = '.zip'
 

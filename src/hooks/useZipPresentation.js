@@ -7,6 +7,7 @@ import {
   MANIFEST_FILE_NAME,
 } from '../lib/constants.js'
 import { validateManifest } from '../lib/manifestValidation.js'
+import { normalizeProceduralScene } from '../lib/proceduralValidation.js'
 import {
   getArchiveEntry,
   getFileExtension,
@@ -46,25 +47,33 @@ function normalizeCaughtError(error) {
   ])
 }
 
+function requiresArchiveAsset(scene) {
+  return scene?.type !== 'procedural'
+}
+
 function assertSceneAssetType(scene) {
+  if (!requiresArchiveAsset(scene)) {
+    return
+  }
+
   const extension = getFileExtension(scene.asset)
 
   if (scene.type === 'static' && !IMAGE_EXTENSIONS.has(extension)) {
-    throw createLoadError(`"${scene.title}" 씬의 에셋 형식을 확인해 주세요.`, [
+    throw createLoadError(`"${scene.title}" 씬의 자산 형식을 확인해 주세요.`, [
       'static 씬은 이미지 파일만 지원합니다.',
       `현재 확장자: ${extension || '없음'}`,
     ])
   }
 
   if (scene.type === 'loop' && !LOOP_VIDEO_EXTENSIONS.has(extension)) {
-    throw createLoadError(`"${scene.title}" 씬의 에셋 형식을 확인해 주세요.`, [
+    throw createLoadError(`"${scene.title}" 씬의 자산 형식을 확인해 주세요.`, [
       'loop 씬은 mp4 파일만 지원합니다.',
       `현재 확장자: ${extension || '없음'}`,
     ])
   }
 
   if (scene.type === 'animated' && !ANIMATED_EXTENSIONS.has(extension)) {
-    throw createLoadError(`"${scene.title}" 씬의 에셋 형식을 확인해 주세요.`, [
+    throw createLoadError(`"${scene.title}" 씬의 자산 형식을 확인해 주세요.`, [
       'animated 씬은 SVG 파일만 지원합니다.',
       `현재 확장자: ${extension || '없음'}`,
     ])
@@ -77,7 +86,7 @@ function createProgressUpdater(setLoadingState, totalAssets) {
     const computedPercent = 35 + ((index + percent / 100) / safeTotal) * 55
 
     setLoadingState({
-      label: `"${sceneTitle}" 씬 에셋을 준비하는 중입니다.`,
+      label: `"${sceneTitle}" 씬 자산을 준비하는 중입니다.`,
       percent: Math.min(95, Math.max(35, Math.round(computedPercent))),
     })
   }
@@ -91,6 +100,10 @@ function createArchiveAssetSummary(scenes, archiveEntries) {
   const missingAssets = []
 
   scenes.forEach((scene) => {
+    if (!requiresArchiveAsset(scene)) {
+      return
+    }
+
     const normalizedAssetPath = normalizeZipPath(scene.asset)
 
     if (!getArchiveEntry(archiveEntries, normalizedAssetPath)) {
@@ -149,7 +162,7 @@ export function useZipPresentation() {
     function ensureCurrentLoad() {
       if (loadTokenRef.current !== nextLoadToken) {
         registry.revokeAll()
-        const abortError = new Error('최신 ZIP 로드 요청으로 교체되었습니다.')
+        const abortError = new Error('최신 ZIP 로드 요청으로 교체했습니다.')
         abortError.name = 'AbortPresentationLoad'
         throw abortError
       }
@@ -216,17 +229,22 @@ export function useZipPresentation() {
       )
 
       if (archiveAssetSummary.missingAssets.length > 0) {
-        throw createLoadError('ZIP 안에 누락된 에셋 파일이 있습니다.', [
+        throw createLoadError('ZIP 안에 누락된 자산 파일이 있습니다.', [
           'manifest.json에는 정의되어 있지만 ZIP 내부에서 찾지 못한 파일이 있습니다.',
           ...archiveAssetSummary.missingAssets.map(
-            (item) => `"${item.sceneTitle}" 씬: ${item.assetPath}`,
+            (item) => `"${item.sceneTitle}" → ${item.assetPath}`,
           ),
           '에디터에서 다시 export하거나 누락된 assets 파일을 포함해 주세요.',
         ])
       }
 
       const uniqueAssetPaths = [
-        ...new Set(manifest.scenes.map((scene) => normalizeZipPath(scene.asset))),
+        ...new Set(
+          manifest.scenes
+            .filter((scene) => requiresArchiveAsset(scene))
+            .map((scene) => normalizeZipPath(scene.asset))
+            .filter(Boolean),
+        ),
       ]
       const updateAssetProgress = createProgressUpdater(
         setLoadingState,
@@ -240,6 +258,22 @@ export function useZipPresentation() {
 
         const scene = manifest.scenes[sceneIndex]
         const { script: _ignoredScript, ...presentationScene } = scene
+
+        if (!requiresArchiveAsset(scene)) {
+          const proceduralScene = normalizeProceduralScene(scene)
+
+          processedScenes.push({
+            ...presentationScene,
+            asset: '',
+            assetUrl: null,
+            assetMimeType: null,
+            svgMarkup: null,
+            template: proceduralScene.template,
+            config: proceduralScene.config,
+          })
+          continue
+        }
+
         const normalizedAssetPath = normalizeZipPath(scene.asset)
         const assetCacheKey = getAssetCacheKey(scene.type, normalizedAssetPath)
         assertSceneAssetType(scene)
@@ -266,8 +300,8 @@ export function useZipPresentation() {
               throw createLoadError(
                 `"${scene.title}" 씬의 highlightOrder를 확인해 주세요.`,
                 [
-                  `SVG 내부에 없는 id: ${missingIds.join(', ')}`,
-                  '에디터에서 SVG ID와 highlightOrder를 다시 확인한 뒤 export해 주세요.',
+                  `SVG 안에 없는 id: ${missingIds.join(', ')}`,
+                  '에디터에서 SVG ID와 highlightOrder를 다시 확인하고 export해 주세요.',
                 ],
               )
             }

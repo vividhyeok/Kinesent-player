@@ -1,47 +1,70 @@
-export function getVisibleHighlightIds(scene, revealedHighlightCount) {
+export function getVisibleHighlightIds(scene, currentTriggerStep) {
   if (!scene || scene.type !== 'animated') {
     return []
   }
 
-  return scene.highlightOrder.slice(0, revealedHighlightCount)
+  return scene.highlightOrder.slice(0, currentTriggerStep)
 }
 
-export function getTriggerOutcome(scene, revealedHighlightCount) {
+export function getTriggerOutcome(scene, currentTriggerStep) {
   if (!scene) {
     return {
       action: 'noop',
-      nextRevealedHighlightCount: revealedHighlightCount,
+      nextTriggerStep: currentTriggerStep,
+    }
+  }
+
+  if (scene.type === 'procedural') {
+    if (currentTriggerStep < scene.triggers) {
+      const nextTriggerStep = currentTriggerStep + 1
+
+      if (nextTriggerStep === scene.triggers) {
+        return {
+          action: 'advance',
+          nextTriggerStep,
+        }
+      }
+
+      return {
+        action: 'step',
+        nextTriggerStep,
+      }
+    }
+
+    return {
+      action: 'advance',
+      nextTriggerStep: currentTriggerStep,
     }
   }
 
   if (scene.type !== 'animated') {
     return {
       action: 'advance',
-      nextRevealedHighlightCount: 0,
+      nextTriggerStep: 0,
     }
   }
 
-  if (revealedHighlightCount < scene.highlightOrder.length) {
-    const nextRevealedHighlightCount = revealedHighlightCount + 1
-    const isLastHighlight = nextRevealedHighlightCount === scene.highlightOrder.length
+  if (currentTriggerStep < scene.highlightOrder.length) {
+    const nextTriggerStep = currentTriggerStep + 1
+    const isLastHighlight = nextTriggerStep === scene.highlightOrder.length
 
     if (isLastHighlight && scene.advanceOnLastHighlight === true) {
       return {
         action: 'advance',
-        nextRevealedHighlightCount,
-        highlightId: scene.highlightOrder[revealedHighlightCount],
+        nextTriggerStep,
+        highlightId: scene.highlightOrder[currentTriggerStep],
       }
     }
 
     return {
-      action: 'highlight',
-      nextRevealedHighlightCount,
-      highlightId: scene.highlightOrder[revealedHighlightCount],
+      action: 'step',
+      nextTriggerStep,
+      highlightId: scene.highlightOrder[currentTriggerStep],
     }
   }
 
   return {
     action: 'advance',
-    nextRevealedHighlightCount: revealedHighlightCount,
+    nextTriggerStep: currentTriggerStep,
   }
 }

@@ -1,5 +1,8 @@
 import { useEffect, useEffectEvent } from 'react'
-import { KEYBOARD_TRIGGER_CODES } from '../lib/constants.js'
+import {
+  KEYBOARD_NEXT_TRIGGER_CODES,
+  KEYBOARD_PREVIOUS_SCENE_CODES,
+} from '../lib/constants.js'
 
 function isEditableTarget(target) {
   if (!(target instanceof HTMLElement)) {
@@ -14,7 +17,7 @@ function isEditableTarget(target) {
   )
 }
 
-export function useKeyboardTrigger({ enabled, onTrigger }) {
+export function useKeyboardTrigger({ enabled, onNext, onPrevious }) {
   const handleKeydown = useEffectEvent((event) => {
     if (!enabled) {
       return
@@ -31,12 +34,20 @@ export function useKeyboardTrigger({ enabled, onTrigger }) {
       return
     }
 
-    if (!KEYBOARD_TRIGGER_CODES.has(event.code) || isEditableTarget(event.target)) {
+    if (isEditableTarget(event.target)) {
       return
     }
 
-    event.preventDefault()
-    onTrigger()
+    if (KEYBOARD_NEXT_TRIGGER_CODES.has(event.code)) {
+      event.preventDefault()
+      onNext?.()
+      return
+    }
+
+    if (KEYBOARD_PREVIOUS_SCENE_CODES.has(event.code)) {
+      event.preventDefault()
+      onPrevious?.()
+    }
   })
 
   useEffect(() => {

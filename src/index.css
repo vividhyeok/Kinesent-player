@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+@keyframes kinesent-scene-transition {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(1);
+  }
+}
+
+@keyframes kinesent-fullscreen-hint {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  12% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  82% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
 :root {
   font-family:
     "Pretendard Variable", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;

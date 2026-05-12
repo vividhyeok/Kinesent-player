@@ -1,9 +1,10 @@
 import { useKeyboardTrigger } from '../../hooks/useKeyboardTrigger.js'
 
-function KeyboardShortcutLayer({ enabled, onTrigger }) {
+function KeyboardShortcutLayer({ enabled, onNext, onPrevious }) {
   useKeyboardTrigger({
     enabled,
-    onTrigger,
+    onNext,
+    onPrevious,
   })
 
   return null

@@ -70,8 +70,8 @@ function PlaybackHint({ isFullscreen, isPresentationReady }) {
       <p className="font-semibold text-white">다음 진행: 스페이스바 또는 PageDown</p>
       <p className="mt-1 text-slate-300">
         {isPresentationReady
-          ? 'animated 씬은 highlightOrder 순서대로 진행되고, 마지막 단계가 끝나면 다음 씬으로 이동합니다.'
-          : 'ZIP 파일을 열면 프레젠테이션 리모컨이나 키보드로 바로 진행할 수 있습니다.'}
+          ? '이전 씬: 왼쪽 화살표. animated와 procedural 씬은 마지막으로 본 단계 상태를 복원합니다.'
+          : 'ZIP 파일을 열면 스페이스바, PageDown, 왼쪽 화살표로 발표를 탐색할 수 있습니다.'}
       </p>
     </div>
   )

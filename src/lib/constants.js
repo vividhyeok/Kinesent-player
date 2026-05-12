@@ -50,7 +50,9 @@ export const CANVAS_ASPECT_RATIO_HEIGHT = 9
 
 export const PRELOAD_SCENE_RADIUS = 1
 
-export const KEYBOARD_TRIGGER_CODES = new Set(['Space', 'PageDown'])
+export const KEYBOARD_NEXT_TRIGGER_CODES = new Set(['Space', 'PageDown'])
+
+export const KEYBOARD_PREVIOUS_SCENE_CODES = new Set(['ArrowLeft'])
 
 export const PLAYBACK_HINT_IDLE_MS = 2800
 
